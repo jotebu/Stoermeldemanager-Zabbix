@@ -1,0 +1,14 @@
+{
+  "id": "{3EEB99E6-A708-401A-8533-1F858632395C}",
+  "name": "Alarmmatrix",
+  "type": 3,
+  "vendor": "jotebu",
+  "aliases": [
+    "Alarmmatrix / Zabbix"
+  ],
+  "parentRequirements": [],
+  "childRequirements": [],
+  "implemented": [],
+  "prefix": "AZA",
+  "url": "https://github.com/jotebu/Stoermeldemanager-Zabbix"
+}
