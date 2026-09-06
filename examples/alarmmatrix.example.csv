@@ -1,0 +1,2 @@
+SchemaVersion;ID;Aktiv;IPS_VariableID;Vergleich;Grenzwert1;Grenzwert2;Hysterese;Kurztext;Langtext;Kategorie;Bereich;Prioritaet;Quittierung;Email;Push;Verzoegerung_s;Eskalation_min;Aktivierungsgruppe;Kommentar;Zabbix_Key
+1;1001;1;12345;EQ;1;;;Testalarm 1001 – Wärmepumpe Sammelstörung;Testmeldung für die Symcon-Zabbix-Anbindung;Heizung;Technikraum;4;1;1;1;0;30;;IPS_VariableID vor dem Import ersetzen;alarm.1001
