@@ -1,0 +1,12 @@
+{
+  "id": "{23FFDDAE-1489-440F-9C02-CC86313E2B18}",
+  "author": "jotebu",
+  "name": "Alarmmatrix",
+  "url": "https://github.com/jotebu/Stoermeldemanager-Zabbix",
+  "compatibility": {
+    "version": "9.0"
+  },
+  "version": "0.1",
+  "build": 1,
+  "date": 1788703200
+}
