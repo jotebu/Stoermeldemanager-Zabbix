@@ -26,10 +26,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$events = $this->loadHistory($groupids, time() - ($history_days * 86400));
 			$events = $this->mergeActiveProblems($events, $this->loadActiveProblems($groupids));
 			$recovery_clocks = $this->loadRecoveryClocks($events);
+			$users = $this->loadUsers($events);
 
 			$rows = [];
 			foreach ($events as $event) {
-				$row = $this->makeRow($event, $recovery_clocks);
+				$row = $this->makeRow($event, $recovery_clocks, $users);
 
 				if ($status_filter === self::STATUS_ACTIVE && $row['status_code'] === 'resolved') {
 					continue;
@@ -111,7 +112,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'value' => TRIGGER_VALUE_TRUE,
 			'groupids' => $groupids,
 			'time_from' => $time_from,
-			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'username', 'name', 'surname'],
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action'],
 			'selectTags' => ['tag', 'value'],
 			'sortfield' => ['clock', 'eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
@@ -133,7 +134,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'object' => EVENT_OBJECT_TRIGGER,
 			'groupids' => $groupids,
 			'recent' => false,
-			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'username', 'name', 'surname'],
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action'],
 			'selectTags' => ['tag', 'value'],
 			'limit' => self::API_LIMIT
 		]);
@@ -173,13 +174,50 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $clocks;
 	}
 
-	private function makeRow(array $event, array $recovery_clocks): array {
+	private function loadUsers(array $events): array {
+		$userids = [];
+		foreach ($events as $event) {
+			foreach ($event['acknowledges'] ?? [] as $acknowledgement) {
+				if (!empty($acknowledgement['userid'])) {
+					$userids[] = (string) $acknowledgement['userid'];
+				}
+			}
+		}
+
+		if ($userids === []) {
+			return [];
+		}
+
+		try {
+			$api_users = API::User()->get([
+				'output' => ['userid', 'username', 'name', 'surname'],
+				'userids' => array_values(array_unique($userids))
+			]);
+		}
+		catch (Throwable $exception) {
+			return [];
+		}
+
+		$users = [];
+		foreach ($api_users as $user) {
+			$display_name = trim(((string) ($user['name'] ?? '')).' '.((string) ($user['surname'] ?? '')));
+			if ($display_name === '') {
+				$display_name = (string) ($user['username'] ?? '');
+			}
+
+			$users[(string) $user['userid']] = $display_name;
+		}
+
+		return $users;
+	}
+
+	private function makeRow(array $event, array $recovery_clocks, array $users): array {
 		$tags = [];
 		foreach ($event['tags'] ?? [] as $tag) {
 			$tags[mb_strtolower(trim((string) $tag['tag']))] = trim((string) $tag['value']);
 		}
 
-		$acknowledgement = $this->firstAcknowledgement($event['acknowledges'] ?? []);
+		$acknowledgement = $this->firstAcknowledgement($event['acknowledges'] ?? [], $users);
 		$r_eventid = (string) ($event['r_eventid'] ?? '0');
 		$resolved_clock = $r_eventid !== '0' ? ($recovery_clocks[$r_eventid] ?? null) : null;
 
@@ -215,17 +253,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 	}
 
-	private function firstAcknowledgement(array $updates): ?array {
+	private function firstAcknowledgement(array $updates, array $users): ?array {
 		$acknowledgements = [];
 		foreach ($updates as $update) {
 			if (((int) ($update['action'] ?? 0) & self::ACKNOWLEDGE_ACTION) === 0) {
 				continue;
 			}
 
-			$display_name = trim(((string) ($update['name'] ?? '')).' '.((string) ($update['surname'] ?? '')));
-			if ($display_name === '') {
-				$display_name = (string) ($update['username'] ?? '');
-			}
+			$userid = (string) ($update['userid'] ?? '');
+			$display_name = $users[$userid] ?? ($userid !== '' ? 'Benutzer #'.$userid : '');
 
 			$acknowledgements[] = [
 				'clock' => (int) $update['clock'],
