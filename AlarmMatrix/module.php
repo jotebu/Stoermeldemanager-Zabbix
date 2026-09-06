@@ -353,7 +353,12 @@ class AlarmMatrix extends IPSModule
     {
         $retry = max(5, $this->ReadPropertyInteger('RetryIntervalSec'));
 
-        if ((int) $state['lastAttempt'] > 0 && ($now - (int) $state['lastAttempt']) < $retry) {
+        // Nur einen zuvor fehlgeschlagenen Sendeversuch verzögern. Nach einer
+        // erfolgreichen Übertragung müssen Gegenrichtungen (insbesondere die
+        // Rückstellung eines Alarms) ohne Retry-Wartezeit gesendet werden.
+        $lastAttemptFailed = (int) $state['lastAttempt'] > (int) $state['lastSent'];
+
+        if ($lastAttemptFailed && ($now - (int) $state['lastAttempt']) < $retry) {
             return $state;
         }
 
