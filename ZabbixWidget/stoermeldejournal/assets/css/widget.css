@@ -1,0 +1,63 @@
+div.dashboard-widget-stoermeldejournal {
+	padding: 0;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-summary {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 10px 12px 4px;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-counter,
+div.dashboard-widget-stoermeldejournal .smj-status,
+div.dashboard-widget-stoermeldejournal .smj-severity {
+	display: inline-block;
+	border-radius: 3px;
+	font-weight: 600;
+	line-height: 1.4;
+	padding: 2px 7px;
+	white-space: nowrap;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-counter-active,
+div.dashboard-widget-stoermeldejournal .smj-status-active {
+	background: #d40000;
+	color: #fff;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-counter-acknowledged,
+div.dashboard-widget-stoermeldejournal .smj-status-acknowledged {
+	background: #e97600;
+	color: #fff;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-counter-resolved,
+div.dashboard-widget-stoermeldejournal .smj-status-resolved {
+	background: #607d6b;
+	color: #fff;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-table-wrap {
+	overflow-x: auto;
+	padding: 4px 8px 8px;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-row-active > td {
+	background-color: rgba(212, 0, 0, 0.12);
+}
+
+div.dashboard-widget-stoermeldejournal .smj-row-acknowledged > td {
+	background-color: rgba(233, 118, 0, 0.13);
+}
+
+div.dashboard-widget-stoermeldejournal .smj-row-resolved > td {
+	color: #6c737a;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-severity-0 { background: #97aab3; color: #fff; }
+div.dashboard-widget-stoermeldejournal .smj-severity-1 { background: #7499ff; color: #fff; }
+div.dashboard-widget-stoermeldejournal .smj-severity-2 { background: #ffc859; color: #212121; }
+div.dashboard-widget-stoermeldejournal .smj-severity-3 { background: #ffa059; color: #212121; }
+div.dashboard-widget-stoermeldejournal .smj-severity-4 { background: #e97659; color: #fff; }
+div.dashboard-widget-stoermeldejournal .smj-severity-5 { background: #e45959; color: #fff; }
