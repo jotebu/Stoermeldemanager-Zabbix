@@ -19,6 +19,10 @@ Version 0.1.1 implementiert den Laufzeitpfad der zentralen Alarmmatrix:
   Wiederholungsintervall für Sendefehler
 - Importbericht und Zustandsvariablen in IP-Symcon
 
+Unter `ZabbixWidget/` befindet sich zusätzlich das eigenständige Zabbix-Frontend-Widget
+**Störmeldejournal**. Version 0.1.0 zeigt Kommen, Quittierung und Behebung eines Alarms zusammengefasst
+in einer GLT-/BIS-ähnlichen Tabellenzeile an. Installationshinweise stehen in `ZabbixWidget/README.md`.
+
 ## Standardkonfiguration
 
 - CSV: `/var/lib/symcon/user/alarmserver/alarmmatrix.csv`
