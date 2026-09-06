@@ -3,7 +3,7 @@
 [![IP-Symcon 9.0](https://img.shields.io/badge/IP--Symcon-9.0%2B-blue)](https://www.symcon.de/)
 [![Zabbix 7.0](https://img.shields.io/badge/Zabbix-7.0-red)](https://www.zabbix.com/)
 
-Version 0.1 implementiert den Laufzeitpfad der zentralen Alarmmatrix:
+Version 0.1.1 implementiert den Laufzeitpfad der zentralen Alarmmatrix:
 
 - Import der semikolongetrennten CSV mit `SchemaVersion=1`
 - strikte Prüfung der 21 vereinbarten Spalten
@@ -15,6 +15,8 @@ Version 0.1 implementiert den Laufzeitpfad der zentralen Alarmmatrix:
 - Abonnement der Variablenänderungen über `RegisterMessage`/`MessageSink`
 - Übertragung von `alarm.<ID> = 0/1` über das native Zabbix-Sender-Protokoll
 - Wiederholung fehlgeschlagener Zustandswechsel
+- sofortige Rückstellung nach erfolgreicher Alarmübertragung, unabhängig vom
+  Wiederholungsintervall für Sendefehler
 - Importbericht und Zustandsvariablen in IP-Symcon
 
 ## Standardkonfiguration
