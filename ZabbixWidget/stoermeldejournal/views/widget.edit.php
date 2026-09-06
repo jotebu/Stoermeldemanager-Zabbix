@@ -1,0 +1,11 @@
+<?php declare(strict_types = 0);
+
+/** @var CView $this */
+/** @var array $data */
+
+(new CWidgetFormView($data))
+	->addField(new CWidgetFieldMultiSelectGroupView($data['fields']['groupids']))
+	->addField(new CWidgetFieldIntegerBoxView($data['fields']['history_days']))
+	->addField(new CWidgetFieldSelectView($data['fields']['status_filter']))
+	->addField(new CWidgetFieldIntegerBoxView($data['fields']['show_lines']))
+	->show();
