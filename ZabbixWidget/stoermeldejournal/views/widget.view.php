@@ -13,9 +13,10 @@ $display_text = static function (string $value): string {
 
 $make_status = static function (array $row): CSpan {
 	$labels = [
-		'active' => _('Störung'),
-		'acknowledged' => _('Quittiert'),
-		'resolved' => _('Behoben')
+		'active' => 'Störung – unquittiert',
+		'acknowledged' => 'Störung – quittiert',
+		'resolved_unacknowledged' => 'Behoben – unquittiert',
+		'resolved_acknowledged' => 'Behoben – quittiert'
 	];
 
 	return (new CSpan($labels[$row['status_code']]))
@@ -47,10 +48,13 @@ if ($data['error'] !== null) {
 }
 
 $summary = (new CDiv([
-	(new CSpan(_('Active').': '.$data['counts']['active']))->addClass('smj-counter smj-counter-active'),
-	(new CSpan(_('Acknowledged').': '.$data['counts']['acknowledged']))
+	(new CSpan('Aktiv unquittiert: '.$data['counts']['active']))->addClass('smj-counter smj-counter-active'),
+	(new CSpan('Aktiv quittiert: '.$data['counts']['acknowledged']))
 		->addClass('smj-counter smj-counter-acknowledged'),
-	(new CSpan(_('Resolved').': '.$data['counts']['resolved']))->addClass('smj-counter smj-counter-resolved')
+	(new CSpan('Behoben unquittiert: '.$data['counts']['resolved_unacknowledged']))
+		->addClass('smj-counter smj-counter-resolved-unacknowledged'),
+	(new CSpan('Behoben quittiert: '.$data['counts']['resolved_acknowledged']))
+		->addClass('smj-counter smj-counter-resolved-acknowledged')
 ]))->addClass('smj-summary');
 
 $table = (new CTableInfo())->setHeader([
@@ -78,10 +82,7 @@ foreach ($data['rows'] as $row) {
 		$action = (new CLink('Quittieren'))
 			->addClass('smj-ack-button')
 			->setAttribute('data-eventid', $row['eventid'])
-			->onClick(
-				'acknowledgePopUp({eventids: [this.dataset.eventid], acknowledge_problem: '.
-				ZBX_PROBLEM_UPDATE_ACKNOWLEDGE.'}, this);'
-			);
+			->setAttribute('data-ack-action', ZBX_PROBLEM_UPDATE_ACKNOWLEDGE);
 	}
 
 	$table->addRow(
