@@ -50,25 +50,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			usort($rows, static function (array $left, array $right): int {
-				$weights = [
-					'active' => 0,
-					'acknowledged' => 1,
-					'resolved_unacknowledged' => 2,
-					'resolved_acknowledged' => 3
-				];
-				$status_compare = $weights[$left['status_code']] <=> $weights[$right['status_code']];
-				if ($status_compare !== 0) {
-					return $status_compare;
+				$clock_compare = $right['clock'] <=> $left['clock'];
+				if ($clock_compare !== 0) {
+					return $clock_compare;
 				}
 
-				if (in_array($left['status_code'], ['active', 'acknowledged'], true)) {
-					$severity_compare = $right['severity'] <=> $left['severity'];
-					if ($severity_compare !== 0) {
-						return $severity_compare;
-					}
-				}
-
-				return $right['clock'] <=> $left['clock'];
+				return (int) $right['eventid'] <=> (int) $left['eventid'];
 			});
 
 			$rows = array_slice($rows, 0, $show_lines);
