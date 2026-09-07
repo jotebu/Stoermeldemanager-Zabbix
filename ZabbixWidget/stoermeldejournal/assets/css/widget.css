@@ -2,6 +2,59 @@ div.dashboard-widget-stoermeldejournal {
 	padding: 0;
 }
 
+div.dashboard-widget-stoermeldejournal .smj-filter-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 8px 12px;
+	padding: 10px 12px 2px;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-filter-field {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-filter-label {
+	color: #6c737a;
+	font-size: 11px;
+	font-weight: 600;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-filter-field-alarm-id input {
+	min-width: 260px;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-filter-reset {
+	margin-bottom: 1px;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-filter-hint {
+	color: #737b82;
+	font-size: 11px;
+	padding: 3px 12px 2px;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-filter-invalid {
+	border-color: #d40000;
+	box-shadow: 0 0 0 1px #d40000;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-filter-empty {
+	display: none;
+	padding: 18px 12px;
+	text-align: center;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-filter-empty-visible {
+	display: block;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-filter-hidden {
+	display: none;
+}
+
 div.dashboard-widget-stoermeldejournal .smj-summary {
 	display: flex;
 	flex-wrap: wrap;
