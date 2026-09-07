@@ -5,6 +5,7 @@ namespace Modules\Stoermeldejournal\Actions;
 use API;
 use CControllerDashboardWidgetView;
 use CControllerResponseData;
+use CRoleHelper;
 use Throwable;
 
 /** Supplies a consolidated COMING -> ACKNOWLEDGED -> RESOLVED journal. */
@@ -69,6 +70,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'name' => $this->getInput('name', $this->widget->getDefaultName()),
 				'rows' => $rows,
 				'counts' => $counts,
+				'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
 				'error' => null,
 				'user' => ['debug_mode' => $this->getDebugMode()]
 			]));
@@ -78,6 +80,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'name' => $this->getInput('name', $this->widget->getDefaultName()),
 				'rows' => [],
 				'counts' => ['active' => 0, 'acknowledged' => 0, 'resolved' => 0],
+				'allowed_acknowledge' => false,
 				'error' => $exception->getMessage(),
 				'user' => ['debug_mode' => $this->getDebugMode()]
 			]));
