@@ -63,13 +63,25 @@ $table = (new CTableInfo())->setHeader([
 	_('Acknowledged'),
 	_('Acknowledged by'),
 	_('Resolved'),
-	_('Status')
+	_('Status'),
+	_('Action')
 ]);
 
 foreach ($data['rows'] as $row) {
 	$ack_user = $display_text($row['ack_user']);
 	if ($row['ack_message'] !== '') {
 		$ack_user = (new CSpan($ack_user))->setAttribute('title', $row['ack_message']);
+	}
+
+	$action = '—';
+	if ($row['status_code'] === 'active' && $data['allowed_acknowledge']) {
+		$action = (new CLink('Quittieren'))
+			->addClass('smj-ack-button')
+			->setAttribute('data-eventid', $row['eventid'])
+			->onClick(
+				'acknowledgePopUp({eventids: [this.dataset.eventid], acknowledge_problem: '.
+				ZBX_PROBLEM_UPDATE_ACKNOWLEDGE.'}, this);'
+			);
 	}
 
 	$table->addRow(
@@ -83,7 +95,8 @@ foreach ($data['rows'] as $row) {
 			$format_time($row['ack_clock']),
 			$ack_user,
 			$format_time($row['resolved_clock']),
-			$make_status($row)
+			$make_status($row),
+			$action
 		]))
 			->addClass('smj-row')
 			->addClass('smj-row-'.$row['status_code'])
