@@ -44,6 +44,15 @@ div.dashboard-widget-stoermeldejournal .smj-status-resolved_acknowledged {
 	color: #fff;
 }
 
+div.dashboard-widget-stoermeldejournal .smj-status-has-comment {
+	cursor: help;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-status-has-comment::after {
+	content: " ⓘ";
+	font-size: 0.9em;
+}
+
 div.dashboard-widget-stoermeldejournal .smj-table-wrap {
 	overflow-x: auto;
 	padding: 4px 8px 8px;
