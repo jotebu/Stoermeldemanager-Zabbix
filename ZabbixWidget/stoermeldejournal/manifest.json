@@ -4,7 +4,7 @@
   "type": "widget",
   "name": "Störmeldejournal",
   "namespace": "Stoermeldejournal",
-	"version": "0.2.2",
+	"version": "0.2.3",
   "author": "jotebu",
   "description": "Kompaktes GLT-Störmeldejournal für Ereignisse aus der Symcon-Alarmmatrix.",
   "actions": {
