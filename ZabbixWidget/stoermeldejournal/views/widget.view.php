@@ -19,9 +19,17 @@ $make_status = static function (array $row): CSpan {
 		'resolved_acknowledged' => 'Behoben – quittiert'
 	];
 
-	return (new CSpan($labels[$row['status_code']]))
+	$status = (new CSpan($labels[$row['status_code']]))
 		->addClass('smj-status')
 		->addClass('smj-status-'.$row['status_code']);
+
+	if ($row['ack_message'] !== '') {
+		$status
+			->addClass('smj-status-has-comment')
+			->setAttribute('title', 'Quittierkommentar: '.$row['ack_message']);
+	}
+
+	return $status;
 };
 
 $make_severity = static function (int $severity): CSpan {
@@ -78,7 +86,8 @@ foreach ($data['rows'] as $row) {
 	}
 
 	$action = '—';
-	if ($row['status_code'] === 'active' && $data['allowed_acknowledge']) {
+	if (in_array($row['status_code'], ['active', 'resolved_unacknowledged'], true)
+			&& $data['allowed_acknowledge']) {
 		$action = (new CLink('Quittieren'))
 			->addClass('smj-ack-button')
 			->setAttribute('data-eventid', $row['eventid'])
