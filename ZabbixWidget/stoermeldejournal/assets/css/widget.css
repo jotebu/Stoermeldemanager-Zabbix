@@ -32,8 +32,14 @@ div.dashboard-widget-stoermeldejournal .smj-status-acknowledged {
 	color: #fff;
 }
 
-div.dashboard-widget-stoermeldejournal .smj-counter-resolved,
-div.dashboard-widget-stoermeldejournal .smj-status-resolved {
+div.dashboard-widget-stoermeldejournal .smj-counter-resolved-unacknowledged,
+div.dashboard-widget-stoermeldejournal .smj-status-resolved_unacknowledged {
+	background: #607d8b;
+	color: #fff;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-counter-resolved-acknowledged,
+div.dashboard-widget-stoermeldejournal .smj-status-resolved_acknowledged {
 	background: #607d6b;
 	color: #fff;
 }
@@ -51,7 +57,13 @@ div.dashboard-widget-stoermeldejournal .smj-row-acknowledged > td {
 	background-color: rgba(233, 118, 0, 0.13);
 }
 
-div.dashboard-widget-stoermeldejournal .smj-row-resolved > td {
+div.dashboard-widget-stoermeldejournal .smj-row-resolved_unacknowledged > td {
+	background-color: rgba(96, 125, 139, 0.09);
+	color: #59636b;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-row-resolved_acknowledged > td {
+	background-color: rgba(96, 125, 107, 0.08);
 	color: #6c737a;
 }
 
