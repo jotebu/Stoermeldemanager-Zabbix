@@ -1,4 +1,4 @@
-# Störmeldejournal 0.2.3
+# Störmeldejournal 0.3.0
 
 Read-only dashboard widget for Zabbix 7.0.
 
@@ -7,6 +7,8 @@ Version 0.2.1 adds acknowledgement directly from an active journal row. It opens
 Version 0.2.2 uses German labels throughout the widget and sorts all rows strictly by the original problem occurrence time, newest first.
 
 Version 0.2.3 keeps the acknowledgement action available for resolved but still unacknowledged events, so a user can acknowledge them afterwards and add a comment. Existing acknowledgement comments are indicated on the status badge and shown completely on mouse-over.
+
+Version 0.3.0 adds an interactive filter bar for status, priority, category, area and alarm IDs. Alarm IDs support individual values, inclusive ranges and exclusions, for example `1001,1010-1020,-1015`. Filter selections remain active while the widget refreshes automatically.
 
 It consolidates a trigger problem event, its first acknowledgement and its recovery into one row. Event tags named `AlarmID`, `Kategorie` and `Bereich` populate the engineering columns. If no host group is configured, the widget uses the group `Alarmmatrix`.
 
