@@ -26,12 +26,12 @@ $make_status = static function (array $row): CSpan {
 
 $make_severity = static function (int $severity): CSpan {
 	$labels = [
-		0 => _('Not classified'),
-		1 => _('Information'),
-		2 => _('Warning'),
-		3 => _('Average'),
-		4 => _('High'),
-		5 => _('Disaster')
+		0 => 'Unklassifiziert',
+		1 => 'Information',
+		2 => 'Warnung',
+		3 => 'Mittel',
+		4 => 'Hoch',
+		5 => 'Kritisch'
 	];
 
 	return (new CSpan($labels[$severity] ?? (string) $severity))
@@ -58,17 +58,17 @@ $summary = (new CDiv([
 ]))->addClass('smj-summary');
 
 $table = (new CTableInfo())->setHeader([
-	_('Alarm ID'),
-	_('Severity'),
-	_('Category'),
-	_('Area'),
-	_('Problem'),
-	_('Occurred'),
-	_('Acknowledged'),
-	_('Acknowledged by'),
-	_('Resolved'),
-	_('Status'),
-	_('Action')
+	'Alarm-ID',
+	'Priorität',
+	'Kategorie',
+	'Bereich',
+	'Meldung',
+	'Eingang',
+	'Quittiert am',
+	'Quittiert durch',
+	'Behoben am',
+	'Status',
+	'Aktion'
 ]);
 
 foreach ($data['rows'] as $row) {
