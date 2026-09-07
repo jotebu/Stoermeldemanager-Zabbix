@@ -5,6 +5,5 @@
 
 (new CWidgetFormView($data))
 	->addField(new CWidgetFieldMultiSelectGroupView($data['fields']['groupids']))
-	->addField(new CWidgetFieldIntegerBoxView($data['fields']['history_days']))
 	->addField(new CWidgetFieldIntegerBoxView($data['fields']['show_lines']))
 	->show();

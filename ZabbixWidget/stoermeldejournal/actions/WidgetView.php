@@ -14,12 +14,25 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private const ACKNOWLEDGE_ACTION = 2;
 	private const API_LIMIT = 1000;
 
+	protected function init(): void {
+		parent::init();
+		$this->addValidationRules([
+			'filter_date_exact' => 'string',
+			'filter_date_from' => 'string',
+			'filter_date_to' => 'string'
+		]);
+	}
+
 	protected function doAction(): void {
 		try {
 			$groupids = $this->resolveGroupIds($this->fields_values['groupids'] ?? []);
-			$history_days = max(1, min(3650, (int) ($this->fields_values['history_days'] ?? 30)));
 			$show_lines = max(10, min(1000, (int) ($this->fields_values['show_lines'] ?? 50)));
-			$events = $this->loadHistory($groupids, time() - ($history_days * 86400));
+			[$time_from, $time_till] = $this->resolveTimeRange(
+				(string) $this->getInput('filter_date_exact', ''),
+				(string) $this->getInput('filter_date_from', ''),
+				(string) $this->getInput('filter_date_to', '')
+			);
+			$events = $this->loadHistory($groupids, $time_from, $time_till);
 			$events = $this->mergeActiveProblems($events, $this->loadActiveProblems($groupids));
 			$recovery_clocks = $this->loadRecoveryClocks($events);
 			$users = $this->loadUsers($events);
@@ -96,20 +109,28 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return array_column($groups, 'groupid');
 	}
 
-	private function loadHistory(array $groupids, int $time_from): array {
-		$events = API::Event()->get([
+	private function loadHistory(array $groupids, ?int $time_from, ?int $time_till): array {
+		$options = [
 			'output' => ['eventid', 'objectid', 'clock', 'name', 'severity', 'acknowledged', 'r_eventid'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
 			'groupids' => $groupids,
-			'time_from' => $time_from,
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action'],
 			'selectTags' => ['tag', 'value'],
 			'sortfield' => ['clock', 'eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => self::API_LIMIT
-		]);
+		];
+
+		if ($time_from !== null) {
+			$options['time_from'] = $time_from;
+		}
+		if ($time_till !== null) {
+			$options['time_till'] = $time_till;
+		}
+
+		$events = API::Event()->get($options);
 
 		$result = [];
 		foreach ($events as $event) {
@@ -117,6 +138,42 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		return $result;
+	}
+
+	private function resolveTimeRange(string $exact, string $from, string $to): array {
+		$exact_date = $this->parseDate($exact);
+		if ($exact_date !== null) {
+			return [
+				$exact_date->setTime(0, 0, 0)->getTimestamp(),
+				$exact_date->setTime(23, 59, 59)->getTimestamp()
+			];
+		}
+
+		$from_date = $this->parseDate($from);
+		$to_date = $this->parseDate($to);
+
+		if ($from_date !== null && $to_date !== null && $from_date > $to_date) {
+			return [null, null];
+		}
+
+		return [
+			$from_date?->setTime(0, 0, 0)->getTimestamp(),
+			$to_date?->setTime(23, 59, 59)->getTimestamp()
+		];
+	}
+
+	private function parseDate(string $value): ?\DateTimeImmutable {
+		if ($value === '' || preg_match('/^\d{4}-\d{2}-\d{2}$/D', $value) !== 1) {
+			return null;
+		}
+
+		$date = \DateTimeImmutable::createFromFormat(
+			'!Y-m-d',
+			$value,
+			new \DateTimeZone(date_default_timezone_get())
+		);
+
+		return $date !== false && $date->format('Y-m-d') === $value ? $date : null;
 	}
 
 	private function loadActiveProblems(array $groupids): array {

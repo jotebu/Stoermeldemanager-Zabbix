@@ -26,14 +26,12 @@ div.dashboard-widget-stoermeldejournal .smj-filter-field-alarm-id input {
 	min-width: 260px;
 }
 
-div.dashboard-widget-stoermeldejournal .smj-filter-reset {
-	margin-bottom: 1px;
+div.dashboard-widget-stoermeldejournal .smj-filter-field-date input {
+	min-width: 138px;
 }
 
-div.dashboard-widget-stoermeldejournal .smj-filter-hint {
-	color: #737b82;
-	font-size: 11px;
-	padding: 3px 12px 2px;
+div.dashboard-widget-stoermeldejournal .smj-filter-reset {
+	margin-bottom: 1px;
 }
 
 div.dashboard-widget-stoermeldejournal .smj-filter-invalid {

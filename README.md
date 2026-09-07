@@ -20,9 +20,11 @@ Version 0.1.1 implementiert den Laufzeitpfad der zentralen Alarmmatrix:
 - Importbericht und Zustandsvariablen in IP-Symcon
 
 Unter `ZabbixWidget/` befindet sich zusätzlich das eigenständige Zabbix-Frontend-Widget
-**Störmeldejournal**. Version 0.3.0 zeigt Kommen, Quittierung und Behebung eines Alarms zusammengefasst
+**Störmeldejournal**. Version 0.4.0 zeigt Kommen, Quittierung und Behebung eines Alarms zusammengefasst
 in einer GLT-/BIS-ähnlichen Tabellenzeile an. Berechtigte Benutzer können aktive Störungen über den nativen
-Zabbix-Dialog direkt aus dem Journal quittieren. Installationshinweise stehen in `ZabbixWidget/README.md`.
+Zabbix-Dialog direkt aus dem Journal quittieren. Das Journal kann die gesamte in Zabbix gespeicherte
+Ereignishistorie durchsuchen und bietet dafür einen exakten Datums- sowie Von-/Bis-Filter.
+Installationshinweise stehen in `ZabbixWidget/README.md`.
 
 ## Standardkonfiguration
 

@@ -6,9 +6,13 @@ class CWidgetStoermeldejournal extends CWidget {
 			priority: '__all__',
 			category: '__all__',
 			area: '__all__',
-			alarm_id: ''
+			alarm_id: '',
+			date_exact: '',
+			date_from: '',
+			date_to: ''
 		};
 		this._show_lines = 50;
+		this._date_refresh_timeout = null;
 	}
 
 	onStart() {
@@ -34,6 +38,21 @@ class CWidgetStoermeldejournal extends CWidget {
 		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 
+	onDestroy() {
+		if (this._date_refresh_timeout !== null) {
+			clearTimeout(this._date_refresh_timeout);
+		}
+	}
+
+	getUpdateRequestData() {
+		return {
+			...super.getUpdateRequestData(),
+			filter_date_exact: this._filter_state.date_exact || undefined,
+			filter_date_from: this._filter_state.date_from || undefined,
+			filter_date_to: this._filter_state.date_to || undefined
+		};
+	}
+
 	setContents(response) {
 		this._show_lines = Math.max(1, Number(response.show_lines) || 50);
 		super.setContents(response);
@@ -53,7 +72,10 @@ class CWidgetStoermeldejournal extends CWidget {
 			priority: this._contents.querySelector('#smj-filter-priority'),
 			category: this._contents.querySelector('#smj-filter-category'),
 			area: this._contents.querySelector('#smj-filter-area'),
-			alarm_id: this._contents.querySelector('#smj-filter-alarm-id')
+			alarm_id: this._contents.querySelector('#smj-filter-alarm-id'),
+			date_exact: this._contents.querySelector('#smj-filter-date-exact'),
+			date_from: this._contents.querySelector('#smj-filter-date-from'),
+			date_to: this._contents.querySelector('#smj-filter-date-to')
 		};
 
 		for (const [name, control] of Object.entries(controls)) {
@@ -64,9 +86,16 @@ class CWidgetStoermeldejournal extends CWidget {
 			control.value = this._filter_state[name];
 			control.addEventListener(name === 'alarm_id' ? 'input' : 'change', () => {
 				this._filter_state[name] = control.value;
+				this.#syncDateControls(controls);
 				this.#applyFilters();
+
+				if (name.startsWith('date_') && this.#dateRangeIsValid()) {
+					this.#scheduleDateRefresh();
+				}
 			});
 		}
+
+		this.#syncDateControls(controls);
 
 		const reset_button = this._contents.querySelector('#smj-filter-reset');
 		if (reset_button !== null) {
@@ -76,7 +105,10 @@ class CWidgetStoermeldejournal extends CWidget {
 					priority: '__all__',
 					category: '__all__',
 					area: '__all__',
-					alarm_id: ''
+					alarm_id: '',
+					date_exact: '',
+					date_from: '',
+					date_to: ''
 				};
 
 				for (const [name, control] of Object.entries(controls)) {
@@ -85,7 +117,9 @@ class CWidgetStoermeldejournal extends CWidget {
 					}
 				}
 
+				this.#syncDateControls(controls);
 				this.#applyFilters();
+				this.#scheduleDateRefresh();
 			});
 		}
 
@@ -96,12 +130,21 @@ class CWidgetStoermeldejournal extends CWidget {
 		const rows = [...this._contents.querySelectorAll('.smj-row')];
 		const alarm_filter = this.#parseAlarmIdFilter(this._filter_state.alarm_id);
 		const alarm_input = this._contents.querySelector('#smj-filter-alarm-id');
+		const date_range_valid = this.#dateRangeIsValid();
+		const date_from_input = this._contents.querySelector('#smj-filter-date-from');
+		const date_to_input = this._contents.querySelector('#smj-filter-date-to');
 
 		if (alarm_input !== null) {
 			alarm_input.classList.toggle('smj-filter-invalid', !alarm_filter.valid);
 			alarm_input.title = alarm_filter.valid
 				? 'Einzelne IDs und Bereiche mit Komma trennen; Minus schließt IDs aus.'
 				: `Ungültige Alarm-ID-Eingabe: ${alarm_filter.invalid_token}`;
+		}
+
+		for (const input of [date_from_input, date_to_input]) {
+			if (input !== null) {
+				input.classList.toggle('smj-filter-invalid', !date_range_valid);
+			}
 		}
 
 		const counts = {
@@ -123,7 +166,8 @@ class CWidgetStoermeldejournal extends CWidget {
 				&& (this._filter_state.area === '__all__'
 					|| row.dataset.smjArea === this._filter_state.area)
 				&& (!alarm_filter.valid
-					|| this.#matchesAlarmId(row.dataset.smjAlarmId, alarm_filter.rules));
+					|| this.#matchesAlarmId(row.dataset.smjAlarmId, alarm_filter.rules))
+				&& (!date_range_valid || this.#matchesDate(row.dataset.smjDate));
 
 			if (matches) {
 				counts[row.dataset.smjStatus]++;
@@ -149,6 +193,46 @@ class CWidgetStoermeldejournal extends CWidget {
 		if (empty_message !== null) {
 			empty_message.classList.toggle('smj-filter-empty-visible', matching_rows === 0);
 		}
+	}
+
+	#syncDateControls(controls) {
+		const exact_active = this._filter_state.date_exact !== '';
+
+		if (controls.date_from !== null) {
+			controls.date_from.disabled = exact_active;
+		}
+		if (controls.date_to !== null) {
+			controls.date_to.disabled = exact_active;
+		}
+	}
+
+	#dateRangeIsValid() {
+		return this._filter_state.date_exact !== ''
+			|| this._filter_state.date_from === ''
+			|| this._filter_state.date_to === ''
+			|| this._filter_state.date_from <= this._filter_state.date_to;
+	}
+
+	#matchesDate(row_date) {
+		if (this._filter_state.date_exact !== '') {
+			return row_date === this._filter_state.date_exact;
+		}
+
+		return (this._filter_state.date_from === '' || row_date >= this._filter_state.date_from)
+			&& (this._filter_state.date_to === '' || row_date <= this._filter_state.date_to);
+	}
+
+	#scheduleDateRefresh() {
+		if (this._date_refresh_timeout !== null) {
+			clearTimeout(this._date_refresh_timeout);
+		}
+
+		this._date_refresh_timeout = setTimeout(() => {
+			this._date_refresh_timeout = null;
+			if (this._state === WIDGET_STATE_ACTIVE) {
+				this._startUpdating();
+			}
+		}, 250);
 	}
 
 	#parseAlarmIdFilter(expression) {

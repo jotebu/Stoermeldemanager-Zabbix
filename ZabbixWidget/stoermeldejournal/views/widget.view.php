@@ -86,6 +86,15 @@ $make_select_filter = static function (string $id, string $label, array $options
 	]))->addClass('smj-filter-field');
 };
 
+$make_date_filter = static function (string $id, string $name, string $label): CDiv {
+	return (new CDiv([
+		(new CSpan($label))->addClass('smj-filter-label'),
+		(new CTextBox($name, ''))
+			->setId($id)
+			->setAttribute('type', 'date')
+	]))->addClass('smj-filter-field smj-filter-field-date');
+};
+
 $filter_bar = (new CDiv([
 	$make_select_filter('smj-filter-status', 'Status', [
 		'__all__' => 'Alle Zustände',
@@ -120,14 +129,13 @@ $filter_bar = (new CDiv([
 			->setAttribute('placeholder', 'z. B. 1001, 1010-1020, -1015')
 			->setAttribute('title', 'Einzelne IDs und Bereiche mit Komma trennen; Minus schließt IDs aus.')
 	]))->addClass('smj-filter-field smj-filter-field-alarm-id'),
+	$make_date_filter('smj-filter-date-exact', 'smj_filter_date_exact', 'Datum'),
+	$make_date_filter('smj-filter-date-from', 'smj_filter_date_from', 'Von'),
+	$make_date_filter('smj-filter-date-to', 'smj_filter_date_to', 'Bis'),
 	(new CButton('smj_filter_reset', 'Filter zurücksetzen'))
 		->setId('smj-filter-reset')
 		->addClass('smj-filter-reset')
 ]))->addClass('smj-filter-bar');
-
-$filter_hint = (new CDiv(
-	'Alarm-ID: Einzelwert 1001 · mehrere Werte 1001,1005 · Bereich 1000-1099 · Ausschluss -1005'
-))->addClass('smj-filter-hint');
 
 $filter_empty = (new CDiv('Keine Meldung entspricht den gewählten Filtern.'))
 	->setId('smj-filter-empty')
@@ -198,12 +206,12 @@ foreach ($data['rows'] as $row) {
 			->setAttribute('data-smj-category', $row['category'])
 			->setAttribute('data-smj-area', $row['area'])
 			->setAttribute('data-smj-alarm-id', $row['alarm_id'])
+			->setAttribute('data-smj-date', zbx_date2str('Y-m-d', $row['clock']))
 	);
 }
 
 (new CWidgetView($data))
 	->addItem($filter_bar)
-	->addItem($filter_hint)
 	->addItem($summary)
 	->addItem($filter_empty)
 	->addItem((new CDiv($table))->addClass('smj-table-wrap'))
