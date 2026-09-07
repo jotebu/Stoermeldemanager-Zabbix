@@ -1,6 +1,6 @@
 # Zabbix-Widget „Störmeldejournal“
 
-Version 0.2.1 stellt Zabbix-Triggerereignisse in einer kompakten GLT-/BIS-ähnlichen Tabelle dar.
+Version 0.2.2 stellt Zabbix-Triggerereignisse in einer kompakten GLT-/BIS-ähnlichen Tabelle dar.
 
 ## Funktionen
 
@@ -12,6 +12,8 @@ Version 0.2.1 stellt Zabbix-Triggerereignisse in einer kompakten GLT-/BIS-ähnli
 - Farblogik für Zustand und Priorität
 - Filter für Hostgruppe, Zeitraum, Zustand und Zeilenanzahl
 - Quittierung aktiver Störungen über den nativen Zabbix-Dialog
+- Sortierung ausschließlich nach dem ursprünglichen Eingang der Störung, neueste Meldung zuerst
+- vollständig deutsche Beschriftung des Widgets
 - Standard-Hostgruppe `Alarmmatrix`, falls im Widget keine Gruppe ausgewählt wurde
 - Zugriff ausschließlich über die internen Zabbix-APIs und damit innerhalb der Rechte des angemeldeten Benutzers
 
@@ -35,7 +37,7 @@ Danach in Zabbix:
 3. Das Modul `Störmeldejournal` aktivieren.
 4. Im gewünschten Dashboard ein neues Widget vom Typ `Störmeldejournal` hinzufügen.
 
-## Version 0.2.1
+## Version 0.2.2
 
 Berechtigte Benutzer können aktive Störungen direkt aus dem Widget quittieren. Der native Zabbix-Dialog
 erlaubt dabei auch einen Kommentar; Benutzer und Zeitpunkt werden vollständig in Zabbix protokolliert.
