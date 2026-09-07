@@ -11,9 +11,6 @@ use Throwable;
 /** Supplies a consolidated COMING -> ACKNOWLEDGED -> RESOLVED journal. */
 class WidgetView extends CControllerDashboardWidgetView {
 
-	private const STATUS_ALL = 0;
-	private const STATUS_ACTIVE = 1;
-	private const STATUS_RESOLVED = 2;
 	private const ACKNOWLEDGE_ACTION = 2;
 	private const API_LIMIT = 1000;
 
@@ -22,8 +19,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$groupids = $this->resolveGroupIds($this->fields_values['groupids'] ?? []);
 			$history_days = max(1, min(3650, (int) ($this->fields_values['history_days'] ?? 30)));
 			$show_lines = max(10, min(1000, (int) ($this->fields_values['show_lines'] ?? 50)));
-			$status_filter = (int) ($this->fields_values['status_filter'] ?? self::STATUS_ALL);
-
 			$events = $this->loadHistory($groupids, time() - ($history_days * 86400));
 			$events = $this->mergeActiveProblems($events, $this->loadActiveProblems($groupids));
 			$recovery_clocks = $this->loadRecoveryClocks($events);
@@ -31,22 +26,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$rows = [];
 			foreach ($events as $event) {
-				$row = $this->makeRow($event, $recovery_clocks, $users);
-
-				$is_resolved = in_array(
-					$row['status_code'],
-					['resolved_unacknowledged', 'resolved_acknowledged'],
-					true
-				);
-
-				if ($status_filter === self::STATUS_ACTIVE && $is_resolved) {
-					continue;
-				}
-				if ($status_filter === self::STATUS_RESOLVED && !$is_resolved) {
-					continue;
-				}
-
-				$rows[] = $row;
+				$rows[] = $this->makeRow($event, $recovery_clocks, $users);
 			}
 
 			usort($rows, static function (array $left, array $right): int {
@@ -58,7 +38,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				return (int) $right['eventid'] <=> (int) $left['eventid'];
 			});
 
-			$rows = array_slice($rows, 0, $show_lines);
 			$counts = [
 				'active' => 0,
 				'acknowledged' => 0,
@@ -73,6 +52,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'name' => $this->getInput('name', $this->widget->getDefaultName()),
 				'rows' => $rows,
 				'counts' => $counts,
+				'show_lines' => $show_lines,
 				'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
 				'error' => null,
 				'user' => ['debug_mode' => $this->getDebugMode()]
@@ -88,6 +68,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'resolved_unacknowledged' => 0,
 					'resolved_acknowledged' => 0
 				],
+				'show_lines' => $show_lines ?? 50,
 				'allowed_acknowledge' => false,
 				'error' => $exception->getMessage(),
 				'user' => ['debug_mode' => $this->getDebugMode()]
