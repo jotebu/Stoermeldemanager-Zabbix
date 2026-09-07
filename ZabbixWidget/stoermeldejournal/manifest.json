@@ -4,7 +4,7 @@
   "type": "widget",
   "name": "Störmeldejournal",
   "namespace": "Stoermeldejournal",
-	"version": "0.1.1",
+	"version": "0.2.0",
   "author": "jotebu",
   "description": "Kompaktes GLT-Störmeldejournal für Ereignisse aus der Symcon-Alarmmatrix.",
   "actions": {
@@ -13,9 +13,11 @@
     }
   },
   "widget": {
-    "form_class": "WidgetForm"
+    "form_class": "WidgetForm",
+    "js_class": "CWidgetStoermeldejournal"
   },
   "assets": {
-    "css": ["widget.css"]
+    "css": ["widget.css"],
+    "js": ["class.widget.js"]
   }
 }
