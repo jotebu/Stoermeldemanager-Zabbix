@@ -33,10 +33,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 			foreach ($events as $event) {
 				$row = $this->makeRow($event, $recovery_clocks, $users);
 
-				if ($status_filter === self::STATUS_ACTIVE && $row['status_code'] === 'resolved') {
+				$is_resolved = in_array(
+					$row['status_code'],
+					['resolved_unacknowledged', 'resolved_acknowledged'],
+					true
+				);
+
+				if ($status_filter === self::STATUS_ACTIVE && $is_resolved) {
 					continue;
 				}
-				if ($status_filter === self::STATUS_RESOLVED && $row['status_code'] !== 'resolved') {
+				if ($status_filter === self::STATUS_RESOLVED && !$is_resolved) {
 					continue;
 				}
 
@@ -44,13 +50,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			usort($rows, static function (array $left, array $right): int {
-				$weights = ['active' => 0, 'acknowledged' => 1, 'resolved' => 2];
+				$weights = [
+					'active' => 0,
+					'acknowledged' => 1,
+					'resolved_unacknowledged' => 2,
+					'resolved_acknowledged' => 3
+				];
 				$status_compare = $weights[$left['status_code']] <=> $weights[$right['status_code']];
 				if ($status_compare !== 0) {
 					return $status_compare;
 				}
 
-				if ($left['status_code'] !== 'resolved') {
+				if (in_array($left['status_code'], ['active', 'acknowledged'], true)) {
 					$severity_compare = $right['severity'] <=> $left['severity'];
 					if ($severity_compare !== 0) {
 						return $severity_compare;
@@ -61,7 +72,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			});
 
 			$rows = array_slice($rows, 0, $show_lines);
-			$counts = ['active' => 0, 'acknowledged' => 0, 'resolved' => 0];
+			$counts = [
+				'active' => 0,
+				'acknowledged' => 0,
+				'resolved_unacknowledged' => 0,
+				'resolved_acknowledged' => 0
+			];
 			foreach ($rows as $row) {
 				$counts[$row['status_code']]++;
 			}
@@ -79,7 +95,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$this->setResponse(new CControllerResponseData([
 				'name' => $this->getInput('name', $this->widget->getDefaultName()),
 				'rows' => [],
-				'counts' => ['active' => 0, 'acknowledged' => 0, 'resolved' => 0],
+				'counts' => [
+					'active' => 0,
+					'acknowledged' => 0,
+					'resolved_unacknowledged' => 0,
+					'resolved_acknowledged' => 0
+				],
 				'allowed_acknowledge' => false,
 				'error' => $exception->getMessage(),
 				'user' => ['debug_mode' => $this->getDebugMode()]
@@ -223,11 +244,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$acknowledgement = $this->firstAcknowledgement($event['acknowledges'] ?? [], $users);
 		$r_eventid = (string) ($event['r_eventid'] ?? '0');
 		$resolved_clock = $r_eventid !== '0' ? ($recovery_clocks[$r_eventid] ?? null) : null;
+		$was_acknowledged = $acknowledgement !== null;
 
 		if ($resolved_clock !== null) {
-			$status_code = 'resolved';
+			$status_code = $was_acknowledged ? 'resolved_acknowledged' : 'resolved_unacknowledged';
 		}
-		elseif ((int) ($event['acknowledged'] ?? 0) === 1) {
+		elseif ($was_acknowledged) {
 			$status_code = 'acknowledged';
 		}
 		else {
