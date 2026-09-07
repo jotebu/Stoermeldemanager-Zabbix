@@ -61,3 +61,21 @@ div.dashboard-widget-stoermeldejournal .smj-severity-2 { background: #ffc859; co
 div.dashboard-widget-stoermeldejournal .smj-severity-3 { background: #ffa059; color: #212121; }
 div.dashboard-widget-stoermeldejournal .smj-severity-4 { background: #e97659; color: #fff; }
 div.dashboard-widget-stoermeldejournal .smj-severity-5 { background: #e45959; color: #fff; }
+
+div.dashboard-widget-stoermeldejournal .smj-ack-button {
+	display: inline-block;
+	border: 1px solid #c13b32;
+	border-radius: 3px;
+	background: #fff;
+	color: #b2261d;
+	font-weight: 600;
+	line-height: 1.4;
+	padding: 2px 8px;
+	white-space: nowrap;
+}
+
+div.dashboard-widget-stoermeldejournal .smj-ack-button:hover,
+div.dashboard-widget-stoermeldejournal .smj-ack-button:focus {
+	background: #b2261d;
+	color: #fff;
+}
