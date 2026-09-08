@@ -1,0 +1,7 @@
+# Beispielwerte für den Aufruf des Importers
+ZABBIX_API_URL=http://127.0.0.1:8080/api_jsonrpc.php
+ZABBIX_HOST=Gebaeudetechnik
+ZABBIX_ALLOWED_HOSTS=192.168.55.35
+
+# Das API-Token wird absichtlich nicht in dieser Datei gespeichert.
+# Standardpfad: /etc/stoermeldemanager-zabbix/zabbix-api.token

@@ -3,12 +3,13 @@
 [![IP-Symcon 9.0](https://img.shields.io/badge/IP--Symcon-9.0%2B-blue)](https://www.symcon.de/)
 [![Zabbix 7.0](https://img.shields.io/badge/Zabbix-7.0-red)](https://www.zabbix.com/)
 
-Dieses Repository enthält zwei getrennt versionierte Komponenten:
+Dieses Repository enthält drei getrennt versionierte Komponenten:
 
 | Komponente | Aktuelle Version | Aufgabe |
 |---|---:|---|
 | **AlarmMatrix für IP-Symcon** | 0.1.1 | CSV einlesen, Alarmbedingungen auswerten und Zustände an Zabbix senden |
 | **Zabbix-Widget Störmeldejournal** | 0.4.0 | Störungen anzeigen, filtern, quittieren und als Journal auswerten |
+| **Zabbix-Alarmmatrix-Importer** | 0.1.0 | Trapper-Items, Trigger und Tags per Zabbix-API synchronisieren |
 
 Die vorgesehene Architektur lautet:
 
@@ -79,8 +80,24 @@ Der Button **Alle aktuellen Zustände senden** sollte erst verwendet werden, wen
 Trapper-Items in Zabbix existieren. Der Verbindungstest verwendet das Test-Item `alarm.1001` und sendet
 den Wert `0`.
 
-Die automatische Zabbix-API-Synchronisierung für Items, Trigger und Tags ist für eine spätere Version
-vorgesehen. Der aktuelle Stand 0.1.1 deckt den geprüften Laufzeitpfad IP-Symcon → Zabbix ab.
+Die serverseitige Zabbix-API-Synchronisierung übernimmt der getrennte Importer im Verzeichnis
+[`AlarmServer`](AlarmServer/README.md). Dadurch bleiben die zeitkritische Laufzeitübertragung in
+IP-Symcon und die administrative Zabbix-Konfiguration sauber voneinander getrennt.
+
+## Zabbix-Alarmmatrix-Importer
+
+### Version 0.1.0
+
+- erster serverseitiger Importer für Zabbix 7.0
+- strikte Prüfung des 21-spaltigen CSV-Schemas
+- sichere Vorschau ohne Änderungen als Standardmodus
+- schreibender Lauf nur mit `--apply` und exakter `--confirm-count`-Bestätigung
+- automatische Anlage und Aktualisierung von Trapper-Items, Triggern und Tags
+- keine automatische Löschung nicht mehr enthaltener Zabbix-Objekte
+- direkte Prioritätsabbildung von Alarmmatrix 1–5 auf Zabbix-Severity 1–5
+- Beschränkung der Trapper-Absender auf die IP-Symcon-Adresse
+
+Installation und Bedienung sind in [`AlarmServer/README.md`](AlarmServer/README.md) beschrieben.
 
 ## Versionsverlauf AlarmMatrix
 
